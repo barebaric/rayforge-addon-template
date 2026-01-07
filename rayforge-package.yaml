@@ -4,6 +4,10 @@ name: "My Awesome Package"
 # A brief, one-sentence description of what your package does. (Required)
 description: "A template package demonstrating code and asset provisioning."
 
+# The Python package versions required by this package.
+depends:
+  - rayforge>=0.27.0,~0.27
+
 author:
   name: "Me Author"
   email: "you@invalid.com"
