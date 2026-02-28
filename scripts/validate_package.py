@@ -25,6 +25,7 @@ METADATA_FILENAME = "rayforge-package.yaml"
 SCHEMA = {
     "name": {"type": str, "required": True},
     "description": {"type": str, "required": True},
+    "api_version": {"type": int, "required": True},
     "author": {"type": dict, "required": True},
     "provides": {"type": dict, "required": True},
 }
@@ -65,6 +66,20 @@ def validate_schema(data):
     _validate_dict_schema(data, SCHEMA)
     _validate_dict_schema(data.get("author", {}), AUTHOR_SCHEMA, "author")
     print("   ... Schema OK")
+
+
+def _check_api_version(api_version):
+    """Validates that api_version is a positive integer."""
+    if not isinstance(api_version, int):
+        raise ValueError(
+            f"api_version must be an integer, got: "
+            f"{type(api_version).__name__}"
+        )
+    if api_version < 1:
+        raise ValueError(
+            f"api_version must be a positive integer, got: {api_version}"
+        )
+    print(f"   ... API version {api_version} OK")
 
 
 def _check_tag(tag):
@@ -127,48 +142,38 @@ def _check_asset_path(path_str, root_path):
         raise FileNotFoundError(f"Asset path '{path_str}' does not exist.")
 
 
+def _is_valid_module_path(path: str) -> bool:
+    """Check if a string is a valid Python module path."""
+    if not path or path.startswith(".") or path.endswith("."):
+        return False
+    parts = path.split(".")
+    return all(part.isidentifier() for part in parts)
+
+
 def _check_code_entry_point(entry_point, root_path):
     """
-    Validates a Python entry point without executing code.
+    Validates a Python module entry point without executing code.
 
-    Checks that the module exists and the specified attribute is defined
-    within it using static analysis (AST).
+    Entry point must be a valid module path like 'my_package.plugin'.
+    Checks that the module exists using static analysis.
     """
-    if ":" not in entry_point:
+    if not _is_valid_module_path(entry_point):
         raise ValueError(
-            f"Code entry point '{entry_point}' is invalid. "
-            "Expected format 'path.to.module:function_name'."
+            f"Entry point '{entry_point}' is not a valid module path. "
+            "Use dotted notation (e.g., 'my_package.plugin')."
         )
-
-    module_name, attr_name = entry_point.split(":", 1)
 
     # Temporarily add package root to path to allow finding the module
     sys.path.insert(0, str(root_path))
     try:
-        spec = importlib.util.find_spec(module_name)
+        spec = importlib.util.find_spec(entry_point)
         if spec is None or spec.origin is None:
-            raise FileNotFoundError(f"Module '{module_name}' not found.")
+            raise FileNotFoundError(f"Module '{entry_point}' not found.")
 
         module_path = Path(spec.origin)
         source = module_path.read_text()
-        tree = ast.parse(source, filename=module_path.name)
-
-        for node in tree.body:
-            # Check for 'def attr_name(...)' or 'class attr_name(...)'
-            if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-                if node.name == attr_name:
-                    print(f"   ... Code entry point '{entry_point}' OK")
-                    return
-            # Check for 'attr_name = ...'
-            if isinstance(node, ast.Assign):
-                for target in node.targets:
-                    if isinstance(target, ast.Name) and target.id == attr_name:
-                        print(f"   ... Code entry point '{entry_point}' OK")
-                        return
-
-        raise NameError(
-            f"Attribute '{attr_name}' not found in module '{module_name}'."
-        )
+        ast.parse(source, filename=module_path.name)
+        print(f"   ... Entry point '{entry_point}' OK")
     finally:
         sys.path.pop(0)
 
@@ -176,10 +181,13 @@ def _check_code_entry_point(entry_point, root_path):
 def _check_provides(provides_data, root_path):
     """Validates the content of the 'provides' section."""
     if not provides_data or not (
-        "code" in provides_data or "assets" in provides_data
+        "backend" in provides_data
+        or "frontend" in provides_data
+        or "assets" in provides_data
     ):
         raise ValueError(
-            "The 'provides' section must contain 'code' and/or 'assets'."
+            "The 'provides' section must contain 'backend', "
+            "'frontend', and/or 'assets'."
         )
 
     if "assets" in provides_data:
@@ -191,8 +199,11 @@ def _check_provides(provides_data, root_path):
                 raise TypeError("Each entry in 'assets' must be a dictionary.")
             _check_asset_path(asset_info.get("path"), root_path)
 
-    if "code" in provides_data:
-        _check_code_entry_point(provides_data["code"], root_path)
+    if "backend" in provides_data:
+        _check_code_entry_point(provides_data["backend"], root_path)
+
+    if "frontend" in provides_data:
+        _check_code_entry_point(provides_data["frontend"], root_path)
 
 
 def validate_content(data, root_path, tag=None, name=None):
@@ -200,6 +211,7 @@ def validate_content(data, root_path, tag=None, name=None):
     print("-> Running content validation...")
     _check_tag(tag)
     _check_package_name(data.get("name"), name)
+    _check_api_version(data.get("api_version"))
 
     _check_non_empty_str(data.get("name"), "name")
     _check_non_empty_str(data.get("description"), "description")
