@@ -6,7 +6,7 @@ description: "A template package demonstrating code and asset provisioning."
 
 # The Python package versions required by this package.
 depends:
-  - rayforge>=0.27.0,~0.27
+  - rayforge>=0.27.0,<2.0.0
 
 author:
   name: "Me Author"
