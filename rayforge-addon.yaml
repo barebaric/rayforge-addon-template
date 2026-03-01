@@ -1,13 +1,13 @@
-# The human-readable name of your package. (Required)
-name: "My Awesome Package"
+# The human-readable name of your addon. (Required)
+name: "My Awesome Addon"
 
-# A brief, one-sentence description of what your package does. (Required)
-description: "A template package demonstrating code and asset provisioning."
+# A brief, one-sentence description of what your addon does. (Required)
+description: "A template addon demonstrating code and asset provisioning."
 
 # The plugin API version. Must match the version expected by Rayforge.
 api_version: 1
 
-# The Python package versions required by this package.
+# The Python addon versions required by this addon.
 depends:
   - rayforge>=0.27.0,<2.0.0
 
@@ -16,7 +16,7 @@ author:
   email: "you@invalid.com"
 
 # ---------------------------------------------------------------------------
-# The 'provides' section tells Rayforge what your package contains.
+# The 'provides' section tells Rayforge what your addon contains.
 # You can have 'backend', 'frontend', 'assets', or a combination.
 # Delete any section you don't need, but at least one is required.
 # ---------------------------------------------------------------------------
@@ -24,16 +24,16 @@ provides:
   # Backend module: loaded in both worker and main processes.
   # Use this for producers, steps, and other non-UI components.
   # The module must contain hook implementations using @hookimpl.
-  backend: "my_package.plugin"
+  backend: "my_addon.backend"
 
   # Frontend module: loaded only in the main process.
   # Use this for UI widgets and other GTK components.
   # The module must contain hook implementations using @hookimpl.
-  frontend: "my_package.ui"
+  frontend: "my_addon.frontend"
 
-  # If your package includes assets, list their type and location here.
+  # If your addon includes assets, list their type and location here.
   assets:
     - type: "material"
       # The 'path' is relative to the root of this repository.
       path: "./assets/materials/"
-      description: "Materials included with this package."
+      description: "Materials included with this addon."

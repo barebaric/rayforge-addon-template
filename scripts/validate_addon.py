@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Validates a Rayforge package for correctness.
+Validates a Rayforge addon for correctness.
 
-This script checks the 'rayforge-package.yaml' metadata file for schema
+This script checks the 'rayforge-addon.yaml' metadata file for schema
 correctness, content consistency, and the existence of declared assets.
 
 It can be run locally (e.g., as a pre-commit hook) or in a CI/CD
@@ -19,7 +19,7 @@ from pathlib import Path
 import semver
 import yaml
 
-METADATA_FILENAME = "rayforge-package.yaml"
+METADATA_FILENAME = "rayforge-addon.yaml"
 
 # Schema defines required keys and their expected types.
 SCHEMA = {
@@ -85,6 +85,10 @@ def _check_api_version(api_version):
 def _check_tag(tag):
     """Validates that a tag is a valid semantic version."""
     if not tag:
+        print(
+            "   ... WARNING: No tag provided. Git tags are required for "
+            "installable addons."
+        )
         return
     try:
         semver.VersionInfo.parse(tag.lstrip("v"))
@@ -96,16 +100,16 @@ def _check_tag(tag):
         )
 
 
-def _check_package_name(metadata_name, expected_name):
-    """Validates package name in metadata against the expected one."""
+def _check_addon_name(metadata_name, expected_name):
+    """Validates addon name in metadata against the expected one."""
     if not expected_name:
         return
     if metadata_name != expected_name:
         raise ValueError(
-            f"Package name mismatch. Expected '{expected_name}', but "
+            f"Addon name mismatch. Expected '{expected_name}', but "
             f"metadata has '{metadata_name}'."
         )
-    print(f"   ... Package name '{expected_name}' OK")
+    print(f"   ... Addon name '{expected_name}' OK")
 
 
 def _check_author_content(author_data):
@@ -154,16 +158,16 @@ def _check_code_entry_point(entry_point, root_path):
     """
     Validates a Python module entry point without executing code.
 
-    Entry point must be a valid module path like 'my_package.plugin'.
+    Entry point must be a valid module path like 'my_addon.plugin'.
     Checks that the module exists using static analysis.
     """
     if not _is_valid_module_path(entry_point):
         raise ValueError(
             f"Entry point '{entry_point}' is not a valid module path. "
-            "Use dotted notation (e.g., 'my_package.plugin')."
+            "Use dotted notation (e.g., 'my_addon.plugin')."
         )
 
-    # Temporarily add package root to path to allow finding the module
+    # Temporarily add addon root to path to allow finding the module
     sys.path.insert(0, str(root_path))
     try:
         spec = importlib.util.find_spec(entry_point)
@@ -210,7 +214,7 @@ def validate_content(data, root_path, tag=None, name=None):
     """Performs sanity checks on the metadata content."""
     print("-> Running content validation...")
     _check_tag(tag)
-    _check_package_name(data.get("name"), name)
+    _check_addon_name(data.get("name"), name)
     _check_api_version(data.get("api_version"))
 
     _check_non_empty_str(data.get("name"), "name")
@@ -237,13 +241,13 @@ def _load_metadata(metadata_file):
 def main():
     """Main execution function. Parses arguments and runs validations."""
     parser = argparse.ArgumentParser(
-        description="Validate a Rayforge package."
+        description="Validate a Rayforge addon."
     )
     parser.add_argument(
         "path",
         nargs="?",
         default=".",
-        help="Path to package root directory (defaults to current dir).",
+        help="Path to addon root directory (defaults to current dir).",
     )
     parser.add_argument(
         "--tag",
@@ -253,13 +257,13 @@ def main():
     parser.add_argument(
         "--name",
         default=None,
-        help="The expected package name (used by CI, optional locally).",
+        help="The expected addon name (used by CI, optional locally).",
     )
     args = parser.parse_args()
 
     root_path = Path(args.path).resolve()
     metadata_file = root_path / METADATA_FILENAME
-    print(f"Validating package at: {root_path}")
+    print(f"Validating addon at: {root_path}")
 
     try:
         metadata = _load_metadata(metadata_file)
@@ -271,7 +275,7 @@ def main():
         validate_schema(metadata)
         validate_content(metadata, root_path, tag=args.tag, name=args.name)
 
-        print("\nSUCCESS: Your package metadata looks great!")
+        print("\nSUCCESS: Your addon metadata looks great!")
         return 0
 
     except (ValueError, TypeError, FileNotFoundError, NameError) as e:

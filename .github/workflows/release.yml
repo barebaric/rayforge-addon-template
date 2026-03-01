@@ -23,7 +23,7 @@ jobs:
           token: ${{ secrets.REGISTRY_ACCESS_TOKEN }}
           
           # This is the event name the central registry is listening for.
-          event-type: package-release-published
+          event-type: addon-release-published
           
           # This is the data payload sent with the announcement.
           # It includes the tag that triggered the workflow and your repository name.
