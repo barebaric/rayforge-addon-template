@@ -10,6 +10,9 @@ from pathlib import Path
 
 from rayforge.core.hooks import hookimpl
 
+# Addon name - must match the directory name for proper cleanup
+ADDON_NAME = "my_addon"
+
 # Set up translations for this addon.
 # The locales directory is at the addon root (next to this module's directory).
 _localedir = Path(__file__).parent.parent / "locales"
@@ -18,12 +21,12 @@ _ = _t.gettext
 
 
 @hookimpl
-def register_step_widgets(widget_registry, addon_name):
+def register_step_widgets(widget_registry):
     """Register UI widgets for step types. Called in frontend context."""
-    # Pass addon_name to register - it's required!
+    # Example:
     # from .widgets import MyStepWidget
     # from .producers import MyProducer
-    # widget_registry.register(MyProducer, MyStepWidget, addon_name=addon_name)
+    # widget_registry.register(MyProducer, MyStepWidget, addon_name=ADDON_NAME)
     pass
 
 
