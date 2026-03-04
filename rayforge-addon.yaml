@@ -1,5 +1,5 @@
-# The human-readable name of your addon. (Required)
-name: "My Awesome Addon"
+# The unique identifier for your addon. Must be a valid Python module name (letters, numbers, and underscores only, cannot start with a number). (Required)
+name: "my_awesome_addon"
 
 # A brief, one-sentence description of what your addon does. (Required)
 description: "A template addon demonstrating code and asset provisioning."

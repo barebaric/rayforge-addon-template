@@ -101,7 +101,16 @@ def _check_tag(tag):
 
 
 def _check_addon_name(metadata_name, expected_name):
-    """Validates addon name in metadata against the expected one."""
+    """Validates addon name in metadata against expected one."""
+    if not metadata_name:
+        raise ValueError("Addon name must not be empty.")
+
+    if not metadata_name.isidentifier():
+        raise ValueError(
+            f"Addon name '{metadata_name}' is not a valid Python module name. "
+            "Must use only letters, numbers, and underscores, and cannot start with a number."
+        )
+
     if not expected_name:
         return
     if metadata_name != expected_name:
@@ -240,9 +249,7 @@ def _load_metadata(metadata_file):
 
 def main():
     """Main execution function. Parses arguments and runs validations."""
-    parser = argparse.ArgumentParser(
-        description="Validate a Rayforge addon."
-    )
+    parser = argparse.ArgumentParser(description="Validate a Rayforge addon.")
     parser.add_argument(
         "path",
         nargs="?",

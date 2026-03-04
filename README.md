@@ -24,6 +24,8 @@ Private repositories are not supported.
 Open the `rayforge-addon.yaml` file and edit the placeholder values to describe
 your addon.
 
+**Important:** The `name` field must be a valid Python module name (letters, numbers, and underscores only, cannot start with a number).
+
 ### Step 3: Add Your Code and Assets
 
 - **Code:** Place your Python source code in the folder you used in `rayforge-addon.yaml`.
@@ -148,3 +150,4 @@ parameter ensures the original English string is displayed.
 - **Keep Your Repository Public:** The Rayforge client needs to be able to clone your repository to install the addon.
 - **Don't Modify the Workflow:** The `.github/workflows/release.yml` file is designed to work out-of-the-box.
 - **Choose a License:** This template includes a placeholder `LICENSE` file. Please replace it with an open-source license of your choice.
+- **Valid Addon Names:** The addon `name` in `rayforge-addon.yaml` must be a valid Python module name (letters, numbers, and underscores only, cannot start with a number).
