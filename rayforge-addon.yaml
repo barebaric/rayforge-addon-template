@@ -15,6 +15,11 @@ author:
   name: "Me Author"
   email: "you@invalid.com"
 
+# The license under which your addon is distributed (optional).
+# Use SPDX license identifiers (e.g., MIT, Apache-2.0, GPL-3.0, BSL-1.1).
+license:
+  name: "MIT"
+
 # ---------------------------------------------------------------------------
 # The 'provides' section tells Rayforge what your addon contains.
 # You can have 'backend', 'frontend', 'assets', or a combination.
