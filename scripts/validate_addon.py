@@ -27,6 +27,7 @@ SCHEMA = {
     "display_name": {"type": str, "required": True},
     "description": {"type": str, "required": True},
     "api_version": {"type": int, "required": True},
+    "depends": {"type": list, "required": False},
     "author": {"type": dict, "required": True},
     "provides": {"type": dict, "required": True},
     "license": {"type": dict, "required": False},
@@ -100,6 +101,56 @@ def _check_tag(tag):
             f"Version tag '{tag}' is not a valid semantic version "
             "(e.g., v1.2.3)."
         )
+
+
+def _check_depends(depends_data):
+    """Validates the 'depends' section."""
+    if not depends_data:
+        return
+
+    if not isinstance(depends_data, list):
+        raise ValueError("'depends' must be a list.")
+
+    for dep in depends_data:
+        if not isinstance(dep, str):
+            raise ValueError(f"Dependency must be a string: {dep}")
+
+        parts = dep.split(",")
+        if not parts or not parts[0]:
+            raise ValueError(f"Invalid dependency format: {dep}")
+
+        pkg_part = parts[0].strip()
+        if not pkg_part:
+            raise ValueError(f"Invalid dependency format: {dep}")
+
+        for constraint in parts[1:]:
+            constraint = constraint.strip()
+            if not constraint:
+                continue
+
+            op_match = re.match(r"^([~^><=!]+)(.+)$", constraint)
+            if not op_match:
+                raise ValueError(
+                    f"Invalid version constraint '{constraint}' in: {dep}"
+                )
+
+            version_str = op_match.group(2).lstrip("v")
+            operator = op_match.group(1)
+
+            if operator == "~":
+                version_parts = version_str.split(".")
+                if len(version_parts) == 2:
+                    version_str = f"{version_str}.0"
+                elif len(version_parts) == 1:
+                    version_str = f"{version_str}.0.0"
+
+            try:
+                semver.VersionInfo.parse(version_str)
+            except ValueError:
+                raise ValueError(
+                    f"Invalid semantic version in constraint "
+                    f"'{constraint}': {dep}"
+                )
 
 
 def _check_addon_name(metadata_name, expected_name):
@@ -247,6 +298,7 @@ def validate_content(data, root_path, tag=None, name=None):
     _check_non_empty_str(data.get("display_name"), "display_name")
     _check_non_empty_str(data.get("description"), "description")
 
+    _check_depends(data.get("depends", []))
     _check_author_content(data.get("author", {}))
     _check_provides(data.get("provides", {}), root_path)
     _check_license(data.get("license"))
