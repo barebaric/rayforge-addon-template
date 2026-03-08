@@ -24,6 +24,7 @@ METADATA_FILENAME = "rayforge-addon.yaml"
 # Schema defines required keys and their expected types.
 SCHEMA = {
     "name": {"type": str, "required": True},
+    "display_name": {"type": str, "required": True},
     "description": {"type": str, "required": True},
     "api_version": {"type": int, "required": True},
     "author": {"type": dict, "required": True},
@@ -243,6 +244,7 @@ def validate_content(data, root_path, tag=None, name=None):
     _check_api_version(data.get("api_version"))
 
     _check_non_empty_str(data.get("name"), "name")
+    _check_non_empty_str(data.get("display_name"), "display_name")
     _check_non_empty_str(data.get("description"), "description")
 
     _check_author_content(data.get("author", {}))

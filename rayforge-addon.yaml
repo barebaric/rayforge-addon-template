@@ -1,6 +1,9 @@
 # The unique identifier for your addon. Must be a valid Python module name (letters, numbers, and underscores only, cannot start with a number). (Required)
 name: "my_awesome_addon"
 
+# The human-readable name shown in the UI. (Required)
+display_name: "My Awesome Addon"
+
 # A brief, one-sentence description of what your addon does. (Required)
 description: "A template addon demonstrating code and asset provisioning."
 
@@ -9,7 +12,7 @@ api_version: 1
 
 # The Python addon versions required by this addon.
 depends:
-  - rayforge>=0.27.0,<2.0.0
+  - rayforge>=0.27.0
 
 author:
   name: "Me Author"
