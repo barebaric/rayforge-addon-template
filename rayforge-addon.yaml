@@ -1,14 +1,15 @@
-# The unique identifier for your addon. Must be a valid Python module name (letters, numbers, and underscores only, cannot start with a number). (Required)
-name: "my_awesome_addon"
+# The unique identifier for your addon. Must be a valid Python module name
+# (letters, numbers, and underscores only, cannot start with a number). (Required)
+name: "my_addon"
 
 # The human-readable name shown in the UI. (Required)
-display_name: "My Awesome Addon"
+display_name: "My Addon"
 
 # A brief, one-sentence description of what your addon does. (Required)
 description: "A template addon demonstrating code and asset provisioning."
 
 # The plugin API version. Must match the version expected by Rayforge.
-api_version: 1
+api_version: 6
 
 # The Python addon versions required by this addon.
 depends:
@@ -30,7 +31,7 @@ license:
 # ---------------------------------------------------------------------------
 provides:
   # Backend module: loaded in both worker and main processes.
-  # Use this for producers, steps, and other non-UI components.
+  # Use this for producers, steps, transformers, and other non-UI components.
   # The module must contain hook implementations using @hookimpl.
   backend: "my_addon.backend"
 

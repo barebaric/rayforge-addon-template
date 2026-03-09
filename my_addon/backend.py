@@ -2,7 +2,7 @@
 Backend entry point for the addon.
 
 This module is loaded in both worker and main processes.
-Use it for producers, steps, and other non-UI components.
+Use it for producers, steps, transformers, and other non-UI components.
 """
 
 import gettext
@@ -23,13 +23,13 @@ _ = _t.gettext
 @hookimpl
 def rayforge_init(context):
     """Called when the application context is fully initialized."""
-    print("My Awesome Addon has been loaded!")
+    print("My Addon has been loaded!")
 
 
 @hookimpl
 def on_unload():
     """Called when the addon is being disabled or unloaded."""
-    print("My Awesome Addon is being unloaded!")
+    print("My Addon is being unloaded!")
 
 
 @hookimpl
@@ -51,15 +51,9 @@ def register_steps(step_registry):
 
 
 @hookimpl
-def register_menu_items(menu_registry):
-    """Register menu items. Called in main process."""
+def register_transformers(transformer_registry):
+    """Register custom transformers. Called in backend context."""
     # Example:
-    # menu_registry.register(
-    #     item_id="my_addon.my_action",
-    #     label=_("My Action"),  # Translatable string
-    #     action="win.my_addon_my_action",
-    #     menu="Tools",
-    #     priority=100,
-    #     addon_name=ADDON_NAME,
-    # )
+    # from .transformers import MyTransformer
+    # transformer_registry.register(MyTransformer, addon_name=ADDON_NAME)
     pass
